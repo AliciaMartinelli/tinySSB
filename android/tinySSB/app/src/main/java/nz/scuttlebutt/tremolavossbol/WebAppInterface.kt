@@ -147,6 +147,8 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
                     return
             }
             */
+            //Msg from Textfield will be handled - alicia
+            //backend("publ:post [] " + btoa(draft) + " null " + " SENT "); //  + recps) from frontend
             "publ:post" -> { // publ:post tips txt voice
                 val a = JSONArray(args[1])
                 val tips = ArrayList<String>(0)
@@ -164,6 +166,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
                 public_post_with_voice(tips, t, v)
                 return
             }
+
             "priv:post" -> { // priv:post tips atob(text) atob(voice) rcp1 rcp2 ...
                 val a = JSONObject(args[1]) as JSONArray
                 val tips = ArrayList<String>(0)
@@ -270,7 +273,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
         Toast.makeText(act, "Import of new ID failed.", Toast.LENGTH_LONG).show()
         return false
     }
-
+    //Daten werden encoded und veröffentlicht mit publish public content - alicia
     fun public_post_with_voice(tips: ArrayList<String>, text: String?, voice: ByteArray?) {
         if (text != null)
             Log.d("wai", "post_voice t- ${text}/${text.length}")
@@ -362,7 +365,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
             eval("b2f_new_incomplete_event($e)")
 
     }
-
+    //incoming msgs? - alicia
     fun sendTinyEventToFrontend(fid: ByteArray, seq: Int, mid:ByteArray, body: ByteArray) {
         Log.d("wai","sendTinyEvent ${body.toHex()}")
         var e = toFrontendObject(fid, seq, mid, body)
