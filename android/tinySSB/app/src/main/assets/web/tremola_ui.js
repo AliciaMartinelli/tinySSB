@@ -263,9 +263,9 @@ function closeOverlay() {
         curr_img_candidate = null;
     }
 }
-
+//if i click the send button then this method will be used - alicia
 function showPreview() {
-    var draft = escapeHTML(document.getElementById('draft').value);
+    var draft = escapeHTML(document.getElementById('draft').value); //text
     if (draft.length == 0) return;
     if (!getSetting("enable_preview")) {
         new_text_post(draft);
