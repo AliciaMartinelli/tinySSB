@@ -279,7 +279,7 @@ function menu_pick_image() {
 }
 
 // ---
-
+//new text to post - used in tremola_ui  - alicia
 function new_text_post(s) {
     if (s.length == 0) {
         return;
@@ -288,7 +288,7 @@ function new_text_post(s) {
     var recps;
     if (curr_chat == "ALL") {
         recps = "ALL";
-        backend("publ:post [] " + btoa(draft) + " null"); //  + recps)
+        backend("publ:post [] " + btoa(draft) + " null"); //  + recps) //i wouldn't add SENT here
     } else {
         recps = tremola.chats[curr_chat].members.join(' ');
         backend("priv:post [] " + btoa(draft) + " null " + recps);
@@ -366,7 +366,14 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     var d = new Date(p["when"]);
     d = d.toDateString() + ' ' + d.toTimeString().substring(0, 5);
     box += "<div align=right style='font-size: x-small;'><i>";
-    box += d + "</i></div></div>";
+    box += d;
+
+    //implement hooks for sent, delivered and read status - alicia
+    if (p.status == "SENT") {
+            box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
+        } else if (p.status === 'DELIVERED') {
+            box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
+        }
     var row;
     if (is_other) {
         var c = tremola.contacts[p.from]
@@ -788,7 +795,7 @@ function import_id(json_str) {
 
 
 // --- Interface to Kotlin side and local (browser) storage
-
+//backend("publ:post [] " + btoa(draft) + " null " + "SENT");
 function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
         Android.onFrontendRequest(cmdStr);
@@ -802,9 +809,9 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
     else if (cmdStr[0] == "wipe") {
         resetTremola()
         location.reload()
-    } else if (cmdStr[0] == 'publ:post') {
+    } else if (cmdStr[0] == 'publ:post') { //if it is a public post it gets send - alicia
         var draft = atob(cmdStr[2])
-        cmdStr.splice(0, 2)
+        cmdStr.splice(0, 2) // remove the first two elements (publ:post and [])
         console.log("CMD STRING", cmdStr)
         var e = {
             'header': {
@@ -813,7 +820,7 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
                 'fid': myId
             },
             'confid': {},
-            'public': ["TAV", atob(cmdStr[0]), null, Date.now()].concat(args)
+            'public': ["TAV", atob(cmdStr[0]), null, Date.now(), "SENT"].concat(args) //add sent status
         }
         b2f_new_event(e)
     } else if (cmdStr[0] == 'kanban') {
@@ -1104,6 +1111,7 @@ function b2f_new_incomplete_event(e) {
  * @param {[]} e.public The payload of the message. The first entry is a String that represents the application to which the message belongs. All additional entries are application-specific parameters.
  *
  */
+ //new event alicia
 function b2f_new_event(e) { // incoming SSB log event: we get map with three entries
                             // console.log('hdr', JSON.stringify(e.header))
     console.log('pub', JSON.stringify(e.public))
@@ -1146,9 +1154,14 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 // var txt = null;
                 // if (a[1] != null)
                 //   txt = a[1];
+                 //'public': ["TAV", atob(cmdStr[0]), null, Date.now(), "SENT"].concat(args)
                 var p = {
-                    "key": e.header.ref, "from": e.header.fid, "body": a[1],
-                    "voice": a[2], "when": a[3] * 1000
+                    "key": e.header.ref,
+                    "from": e.header.fid,
+                    "body": a[1],
+                    "voice": a[2],
+                    "when": a[3] * 1000,
+                    "status": a[4] //status here should work but it seems not???
                 };
                 console.log("new post 2 ", p)
                 console.log("time: ", a[3])
