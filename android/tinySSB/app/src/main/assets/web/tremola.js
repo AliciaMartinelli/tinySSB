@@ -369,11 +369,13 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     box += d;
 
     //implement hooks for sent, delivered and read status - alicia
-    if (p.status == "SENT") {
-            box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
-        } else if (p.status === 'DELIVERED') {
-            box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
-        }
+    if (!is_other)
+            if (p.status == "SENT") {
+                        box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
+            } else if (p.status === 'DELIVERED') {
+                box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
+            }
+
     console.log("status: " + p.status)
     var row;
     if (is_other) {
@@ -1152,7 +1154,6 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 // var txt = null;
                 // if (a[1] != null)
                 //   txt = a[1];
-                 //'public': ["TAV", atob(cmdStr[0]), null, Date.now(), "SENT"]
                 var p = {
                     "key": e.header.ref,
                     "from": e.header.fid,
