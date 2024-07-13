@@ -148,7 +148,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
             }
             */
             //Msg from Textfield will be handled - alicia
-            //backend("publ:post [] " + btoa(draft) + " null " + " SENT "); //  + recps) from frontend
+            //backend("publ:post [] " + btoa(draft) + " null" + " SENT");
             "publ:post" -> { // publ:post tips txt voice
                 val a = JSONArray(args[1])
                 val tips = ArrayList<String>(0)
@@ -163,7 +163,9 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
                 var v: ByteArray? = null
                 if (args.size > 3 && args[3] != "null")
                     v = Base64.decode(args[3], Base64.NO_WRAP)
-                public_post_with_voice(tips, t, v)
+
+                val status = if (args.size > 4) args[4] else ""
+                public_post_with_voice(tips, t, v, status)
                 return
             }
 
@@ -274,7 +276,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
         return false
     }
     //Daten werden encoded und veröffentlicht mit publish public content - alicia
-    fun public_post_with_voice(tips: ArrayList<String>, text: String?, voice: ByteArray?) {
+    fun public_post_with_voice(tips: ArrayList<String>, text: String?, voice: ByteArray?, status: String?) {
         if (text != null)
             Log.d("wai", "post_voice t- ${text}/${text.length}")
         if (voice != null)
@@ -287,6 +289,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
         val tst = Bipf.mkInt((System.currentTimeMillis() / 1000).toInt())
         Log.d("wai", "send time is ${tst.getInt()}")
         Bipf.list_append(lst, tst)
+        Bipf.list_append(lst, if (status == null) Bipf.mkNone() else Bipf.mkString(status))
         val body = Bipf.encode(lst)
         if (body != null)
             act.tinyNode.publish_public_content(body)
@@ -369,6 +372,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
     fun sendTinyEventToFrontend(fid: ByteArray, seq: Int, mid:ByteArray, body: ByteArray) {
         Log.d("wai","sendTinyEvent ${body.toHex()}")
         var e = toFrontendObject(fid, seq, mid, body)
+        Log.d("Alicia", "e to Frontend: $e")
         if (e != null)
             eval("b2f_new_event($e)")
 
@@ -396,6 +400,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
             return null
         }
         val param = Bipf.bipf_list2JSON(bodyList)
+        Log.d("Alicia", "decoded payload: $param.toString()")
         var hdr = JSONObject()
         hdr.put("fid", "@" + fid.toBase64() + ".ed25519")
         hdr.put("ref", mid.toBase64())

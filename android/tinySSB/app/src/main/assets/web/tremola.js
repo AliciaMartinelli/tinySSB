@@ -288,7 +288,7 @@ function new_text_post(s) {
     var recps;
     if (curr_chat == "ALL") {
         recps = "ALL";
-        backend("publ:post [] " + btoa(draft) + " null"); //  + recps) //i wouldn't add SENT here
+        backend("publ:post [] " + btoa(draft) + " null" + " SENT"); //  + recps)
     } else {
         recps = tremola.chats[curr_chat].members.join(' ');
         backend("priv:post [] " + btoa(draft) + " null " + recps);
@@ -374,6 +374,7 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
         } else if (p.status === 'DELIVERED') {
             box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
         }
+    console.log("status: " + p.status)
     var row;
     if (is_other) {
         var c = tremola.contacts[p.from]
@@ -795,9 +796,9 @@ function import_id(json_str) {
 
 
 // --- Interface to Kotlin side and local (browser) storage
-//backend("publ:post [] " + btoa(draft) + " null " + "SENT");
 function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
+        console.log("Alicia: backend String - " + cmdStr)
         Android.onFrontendRequest(cmdStr);
         return;
     }
@@ -820,7 +821,7 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
                 'fid': myId
             },
             'confid': {},
-            'public': ["TAV", atob(cmdStr[0]), null, Date.now(), "SENT"].concat(args) //add sent status
+            'public': ["TAV", atob(cmdStr[0]), null, Date.now(), cmdStr[2]] //add sent status
         }
         b2f_new_event(e)
     } else if (cmdStr[0] == 'kanban') {
@@ -849,9 +850,7 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
             'confid': {},
             'public': ["KAN", cmdStr[1], prev, cmdStr[3]].concat(args)
         }
-        // console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
-        console.log(e)
     } else {
         // console.log('backend', JSON.stringify(cmdStr))
     }
@@ -1114,7 +1113,6 @@ function b2f_new_incomplete_event(e) {
  //new event alicia
 function b2f_new_event(e) { // incoming SSB log event: we get map with three entries
                             // console.log('hdr', JSON.stringify(e.header))
-    console.log('pub', JSON.stringify(e.public))
     // console.log('cfd', JSON.stringify(e.confid))
     console.log("New Frontend Event: " + JSON.stringify(e.header))
 
@@ -1154,16 +1152,15 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 // var txt = null;
                 // if (a[1] != null)
                 //   txt = a[1];
-                 //'public': ["TAV", atob(cmdStr[0]), null, Date.now(), "SENT"].concat(args)
+                 //'public': ["TAV", atob(cmdStr[0]), null, Date.now(), "SENT"]
                 var p = {
                     "key": e.header.ref,
                     "from": e.header.fid,
                     "body": a[1],
                     "voice": a[2],
                     "when": a[3] * 1000,
-                    "status": a[4] //status here should work but it seems not???
+                    "status": a[4]
                 };
-                console.log("new post 2 ", p)
                 console.log("time: ", a[3])
                 ch["posts"][e.header.ref] = p;
                 if (ch["touched"] < e.header.tst)

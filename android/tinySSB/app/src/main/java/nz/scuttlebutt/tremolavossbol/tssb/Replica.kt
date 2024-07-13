@@ -342,6 +342,7 @@ class Replica(val context: MainActivity, val datapath: File, val fid: ByteArray)
             return null
         var pos = log.length()
         var cnt = state.max_seq - seq + 1
+        var status: String? = null
         RandomAccessFile(log, "rwd").use { f ->
             while (cnt > 0) {
                 f.seek(pos - 4)
@@ -351,6 +352,7 @@ class Replica(val context: MainActivity, val datapath: File, val fid: ByteArray)
             f.seek(pos)
             val pkt = ByteArray(TINYSSB_PKT_LEN)
             f.read(pkt)
+
             if (pkt[7].toInt() == PKTTYPE_plain48)
                 return pkt.sliceArray(8 until 56)
             if (pkt[7].toInt() == PKTTYPE_chain20) { //read whole sidechain
@@ -401,7 +403,7 @@ class Replica(val context: MainActivity, val datapath: File, val fid: ByteArray)
         persist_frontier(seq, wire.size + 4, (nam +wire).sha256().sliceArray(0 until HASH_LEN))
         return seq
     }
-
+    //alicia
     fun write(c: ByteArray): Int {
         var content = c
         if(log.length().toInt() != state.max_pos)

@@ -156,7 +156,7 @@ class Node(val context: MainActivity) {
         if (buf.size != TINYSSB_PKT_LEN) return
         context.tinyRepo.sidechain_append(buf, fid, seq)
     }
-
+    //alicia
     fun publish_public_content(content: ByteArray) {
         val repo = context.tinyRepo
         Log.d("node", "publish_public_content ${content.size}B")
