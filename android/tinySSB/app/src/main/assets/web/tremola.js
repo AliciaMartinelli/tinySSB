@@ -373,7 +373,7 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     if (!is_other)
             if (p.status == "SENT") {
                         box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
-            } else if (p.status == 'DELIVERED') {
+            } else if (p.status == 'CONF') {
                 box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
             }
 
@@ -414,13 +414,17 @@ function load_chat(nm) {
             var post2 = ch.posts[p2];
             if (post2["from"] !== myId && post2["body"] === post1.key) {
                 // Set the status of the original post to delivered
-                post1.status = 'DELIVERED';
+                post1.status = 'CONF';
             }
         });
     });
 
+    var filteredPosts = lop.filter(function(p) {
+            return ch.posts[p].status !== 'DELIVERED';
+    });
+
     //Alicia - load the posts
-    lop.forEach(function (p) {
+    filteredPosts.forEach(function (p) {
         load_post_item(ch.posts[p])
     })
 
