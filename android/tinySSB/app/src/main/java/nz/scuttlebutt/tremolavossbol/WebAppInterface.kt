@@ -147,8 +147,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
                     return
             }
             */
-            //Msg from Textfield will be handled - alicia
-            //backend("publ:post [] " + btoa(draft) + " null" + " SENT");
+
             "publ:post" -> { // publ:post tips txt voice
                 val a = JSONArray(args[1])
                 val tips = ArrayList<String>(0)
@@ -275,7 +274,6 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
         Toast.makeText(act, "Import of new ID failed.", Toast.LENGTH_LONG).show()
         return false
     }
-    //Daten werden encoded und veröffentlicht mit publish public content - alicia
     fun public_post_with_voice(tips: ArrayList<String>, text: String?, voice: ByteArray?, status: String?) {
         if (text != null)
             Log.d("wai", "post_voice t- ${text}/${text.length}")
@@ -370,7 +368,6 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
     }
 
     fun sendConfirmationPost(s: String) {
-        //sendConfirmationPost("publ:post [] " + encodedDraft + " null" + " DELIVERED")
         val args = s.split(" ")
         val a = JSONArray(args[1])
         val tips = ArrayList<String>(0)
@@ -395,8 +392,6 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
         sendConfirmationPost("publ:post [] " + encodedDraft + " null" + " DELIVERED") //with ref number as text
     }
 
-    //incoming msgs? - alicia
-    //sendTinyEventToFrontend(fid, i, mid, payload)
     fun sendTinyEventToFrontend(fid: ByteArray, seq: Int, mid:ByteArray, body: ByteArray) {
         Log.d("wai","sendTinyEvent ${body.toHex()}")
         var e = toFrontendObject(fid, seq, mid, body)
@@ -434,7 +429,6 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
             return null
         }
         val param = Bipf.bipf_list2JSON(bodyList)
-        Log.d("Alicia", "decoded payload - key???: $param.toString()")
         var hdr = JSONObject()
         hdr.put("fid", "@" + fid.toBase64() + ".ed25519")
         hdr.put("ref", mid.toBase64())

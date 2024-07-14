@@ -143,7 +143,7 @@ class Node(val context: MainActivity) {
         if (chnk_buf != null)
             context.tinyIO.enqueue(chnk_buf, context.tinyDemux.chnk_dmx)
     }
-    //for incoming packets - alicia
+
     fun incoming_pkt(buf: ByteArray, fid: ByteArray) {
         Log.d("node", "incoming logEntry ${buf.size}B, fid: ${fid.toHex()}")
         if (buf.size != TINYSSB_PKT_LEN) return
@@ -156,7 +156,7 @@ class Node(val context: MainActivity) {
         if (buf.size != TINYSSB_PKT_LEN) return
         context.tinyRepo.sidechain_append(buf, fid, seq)
     }
-    //alicia
+
     fun publish_public_content(content: ByteArray) {
         val repo = context.tinyRepo
         Log.d("node", "publish_public_content ${content.size}B")

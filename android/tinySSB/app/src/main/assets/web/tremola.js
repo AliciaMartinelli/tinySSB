@@ -279,7 +279,6 @@ function menu_pick_image() {
 }
 
 // ---
-//new text to post - used in tremola_ui  - alicia
 function new_text_post(s) {
     if (s.length == 0) {
         return;
@@ -343,7 +342,6 @@ function new_image_post() {
 }
 
 function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
-    console.log("Alicia - load post item - key: " + p.key)
     var pl = document.getElementById('lst:posts');
     var is_other = p["from"] != myId;
     var box = "<div class=light style='padding: 3pt; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.7); word-break: break-word;'"
@@ -369,10 +367,10 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     box += "<div align=right style='font-size: x-small;'><i>";
     box += d;
 
-    //implement hooks for sent, delivered and read status - alicia
+
     if (!is_other)
             if (p.status == "SENT") {
-                        box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
+                box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
             } else if (p.status == 'CONF') {
                 box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
             }
@@ -407,13 +405,12 @@ function load_chat(nm) {
     lop.sort(function (a, b) {
         return ch.posts[a].when - ch.posts[b].when
     })
-    //Alicia - check for confirmation messages and update the status
+
     lop.forEach(function (p1) {
         var post1 = ch.posts[p1];
         lop.forEach(function (p2) {
             var post2 = ch.posts[p2];
             if (post2["from"] !== myId && post2["body"] === post1.key) {
-                // Set the status of the original post to delivered
                 post1.status = 'CONF';
             }
         });
@@ -423,7 +420,6 @@ function load_chat(nm) {
             return ch.posts[p].status !== 'DELIVERED';
     });
 
-    //Alicia - load the posts
     filteredPosts.forEach(function (p) {
         load_post_item(ch.posts[p])
     })
@@ -819,7 +815,6 @@ function import_id(json_str) {
 // --- Interface to Kotlin side and local (browser) storage
 function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
-        console.log("Alicia: backend String - " + cmdStr)
         Android.onFrontendRequest(cmdStr);
         return;
     }
@@ -831,7 +826,7 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
     else if (cmdStr[0] == "wipe") {
         resetTremola()
         location.reload()
-    } else if (cmdStr[0] == 'publ:post') { //if it is a public post it gets send - alicia
+    } else if (cmdStr[0] == 'publ:post') {
         var draft = atob(cmdStr[2])
         cmdStr.splice(0, 2) // remove the first two elements (publ:post and [])
         console.log("CMD STRING", cmdStr)
@@ -1131,7 +1126,7 @@ function b2f_new_incomplete_event(e) {
  * @param {[]} e.public The payload of the message. The first entry is a String that represents the application to which the message belongs. All additional entries are application-specific parameters.
  *
  */
- //new event alicia
+
 function b2f_new_event(e) { // incoming SSB log event: we get map with three entries
                             // console.log('hdr', JSON.stringify(e.header))
     // console.log('cfd', JSON.stringify(e.confid))

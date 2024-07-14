@@ -131,7 +131,7 @@ class Replica(val context: MainActivity, val datapath: File, val fid: ByteArray)
         f.write(state.toWire())
         fnt.finishWrite(f)
     }
-    //handles incoming packets and informs frontend of new entries - alicia
+
     fun ingest_entry_pkt(pkt: ByteArray, seq: Int): Boolean {
         Log.d("Replica", "ingest_entry_pkt")
         var sendToFront = false
@@ -403,7 +403,7 @@ class Replica(val context: MainActivity, val datapath: File, val fid: ByteArray)
         persist_frontier(seq, wire.size + 4, (nam +wire).sha256().sliceArray(0 until HASH_LEN))
         return seq
     }
-    //alicia
+
     fun write(c: ByteArray): Int {
         var content = c
         if(log.length().toInt() != state.max_pos)
