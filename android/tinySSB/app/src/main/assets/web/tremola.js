@@ -343,6 +343,7 @@ function new_image_post() {
 }
 
 function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
+    console.log("Alicia - load post item - key: " + p.key)
     var pl = document.getElementById('lst:posts');
     var is_other = p["from"] != myId;
     var box = "<div class=light style='padding: 3pt; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.7); word-break: break-word;'"
@@ -372,7 +373,7 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     if (!is_other)
             if (p.status == "SENT") {
                         box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
-            } else if (p.status === 'DELIVERED') {
+            } else if (p.status == 'DELIVERED') {
                 box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
             }
 
@@ -406,9 +407,23 @@ function load_chat(nm) {
     lop.sort(function (a, b) {
         return ch.posts[a].when - ch.posts[b].when
     })
+    //Alicia - check for confirmation messages and update the status
+    lop.forEach(function (p1) {
+        var post1 = ch.posts[p1];
+        lop.forEach(function (p2) {
+            var post2 = ch.posts[p2];
+            if (post2["from"] !== myId && post2["body"] === post1.key) {
+                // Set the status of the original post to delivered
+                post1.status = 'DELIVERED';
+            }
+        });
+    });
+
+    //Alicia - load the posts
     lop.forEach(function (p) {
         load_post_item(ch.posts[p])
     })
+
     load_chat_title(ch);
     setScenario("posts");
     document.getElementById("tremolaTitle").style.display = 'none';

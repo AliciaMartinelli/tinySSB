@@ -368,14 +368,48 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
             eval("b2f_new_incomplete_event($e)")
 
     }
+
+    fun sendConfirmationPost(s: String) {
+        //sendConfirmationPost("publ:post [] " + encodedDraft + " null" + " DELIVERED")
+        val args = s.split(" ")
+        val a = JSONArray(args[1])
+        val tips = ArrayList<String>(0)
+        for (i in 0..a.length() - 1) {
+            val s = (a[i] as JSONObject).toString()
+            Log.d("publ:post", s)
+            tips.add(s)
+        }
+        var t: String? = null
+        if (args[2] != "null")
+            t = Base64.decode(args[2], Base64.NO_WRAP).decodeToString()
+        var v: ByteArray? = null
+        if (args.size > 3 && args[3] != "null")
+            v = Base64.decode(args[3], Base64.NO_WRAP)
+
+        val status = if (args.size > 4) args[4] else ""
+        public_post_with_voice(tips, t, v, status)
+        }
+
+    fun createConfirmationStringAndSend(draft: String) {
+        val encodedDraft = Base64.encodeToString(draft.toByteArray(), Base64.DEFAULT)
+        sendConfirmationPost("publ:post [] " + encodedDraft + " null" + " DELIVERED") //with ref number as text
+    }
+
     //incoming msgs? - alicia
+    //sendTinyEventToFrontend(fid, i, mid, payload)
     fun sendTinyEventToFrontend(fid: ByteArray, seq: Int, mid:ByteArray, body: ByteArray) {
         Log.d("wai","sendTinyEvent ${body.toHex()}")
         var e = toFrontendObject(fid, seq, mid, body)
-        Log.d("Alicia", "e to Frontend: $e")
-        if (e != null)
-            eval("b2f_new_event($e)")
+        val jsonObject = JSONObject(e)
+        val ref = jsonObject.getJSONObject("header").getString("ref")
+        val status = jsonObject.getJSONArray("public").getString(4)
 
+        if (e != null) {
+            if (status != "DELIVERED") {
+                createConfirmationStringAndSend(ref)
+            }
+            eval("b2f_new_event($e)")
+        }
         // in-order api
         val replica = act.tinyRepo.fid2replica(fid)
 
@@ -400,7 +434,7 @@ class WebAppInterface(val act: MainActivity, val webView: WebView) {
             return null
         }
         val param = Bipf.bipf_list2JSON(bodyList)
-        Log.d("Alicia", "decoded payload: $param.toString()")
+        Log.d("Alicia", "decoded payload - key???: $param.toString()")
         var hdr = JSONObject()
         hdr.put("fid", "@" + fid.toBase64() + ".ed25519")
         hdr.put("ref", mid.toBase64())
