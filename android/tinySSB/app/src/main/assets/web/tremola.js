@@ -371,11 +371,9 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     if (!is_other)
             if (p.status == "SENT") {
                 box += "<span class='chat-status-icons sent'>&#x2713;</span></i></div></div>";
-            } else if (p.status == 'CONF') {
+            } else if (p.status == "CONF") {
                 box += "<span class='chat-status-icons delivered'>&#x2713;&#x2713;</span></i></div></div>";
             }
-
-    console.log("status: " + p.status)
     var row;
     if (is_other) {
         var c = tremola.contacts[p.from]
